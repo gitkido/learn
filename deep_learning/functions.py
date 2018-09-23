@@ -1,13 +1,8 @@
-# 活性化関数
+# 関数
 
 import numpy as np
 
-# 階段関数 (スカラしか使えないバージョン)
-#def step_function(x):
-#    if x > 0:
-#        return 1
-#    else:
-#        return 0
+""" 活性化関数 """
 
 # 階段関数 (テンソルが使えるバージョン)
 def stepf(x):
@@ -22,3 +17,9 @@ def sigmoid(x):
 # ReLU関数
 def ReLU(x):
     return np.maximum(0, x)
+
+""" その他の関数 """
+
+# 恒等関数
+def identity_function(x):
+    return x
