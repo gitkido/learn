@@ -18,8 +18,33 @@ def sigmoid(x):
 def ReLU(x):
     return np.maximum(0, x)
 
-""" その他の関数 """
+""" 出力層の活性化関数 """
 
 # 恒等関数
 def identity_function(x):
     return x
+
+# ソフトマックス関数 (オーバーフロー対策付き)
+def softmax(a):
+
+    c = np.max(a)
+
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    
+    return y
+
+""" 損失関数 """
+
+# ※yはニューラルネットワークの出力、tは教師データ
+
+# 2乗和誤差
+def mean_squared_error(y, t):
+    return 0.5 * np.sum((y - t)**2)
+
+# 交差エントロピー誤差
+# 教師データはone-hot表現になっていることが前提
+def cross_entropy_error(y, t):
+    delta = 1e-7 # log(0) (= -inf) にならないように対策
+    return -1.0 * np.sum(t * np.log(y + delta))
