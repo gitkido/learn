@@ -47,4 +47,45 @@ def mean_squared_error(y, t):
 # 教師データはone-hot表現になっていることが前提
 def cross_entropy_error(y, t):
     delta = 1e-7 # log(0) (= -inf) にならないように対策
-    return -1.0 * np.sum(t * np.log(y + delta))
+    return -np.sum(t * np.log(y + delta))
+
+# 交差エントロピー誤差（バッチ対応版1）
+# 教師データはone-hot表現になっていることが前提
+def cross_entropy_error1(y, t):
+    if y.ndim == 1:
+        y = y.reshape(1, y.size)
+        t = t.reshape(1, t.size)
+    '''
+    この部分の注意。
+    yは、通常こんなのが来る想定で
+
+    [[1, 2, 3, 4, 5, 6, 7, 8],
+     [1, 2, 3, 4, 5, 6, 7, 8],
+               ...
+     [1, 2, 3, 4, 5, 6, 7, 8]]
+    
+    データが1つだけの場合は特殊形式になってしまうので、↑と合わせる。
+    [1, 2, 3, 4, 5, 6, 7, 8]   こうではなく
+    [[1, 2, 3, 4, 5, 6, 7, 8]] こう
+    '''
+    batch_size = y.shape[0] # 何件のデータを束ねたバッチか
+    delta = 1e-7 # log(0) (= -inf) にならないように対策
+    return -np.sum(t * np.log(y + delta)) / batch_size
+
+# 交差エントロピー誤差（バッチ対応版2）
+# 教師データは正解ラベルが格納された配列（[2, 7, 0, 9, 4]みたいな）の前提
+def cross_entropy_error2(y, t):
+    if y.ndim == 1:
+        y = y.reshape(1, y.size)
+        t = t.reshape(1, t.size)
+    
+    batch_size = y.shape[0]
+    delta = 1e-7
+    return -np.sum(np.log(y[np.arange(batch_size), t] + delta)) / batch_size
+    ''' ココの注意。
+    y[np.arange(5), t] ※5は例
+    = y[[0, 1, 2, 3, 4], [2, 7, 0, 9, 4]]
+    = [y[0, 2], y[1, 7], y[2, 0], y[3, 9], y[4, 4]]
+    →正解ラベルの値だけが抽出できる。
+    （numpyの配列はこういう動きみたい。自然なような、恣意的なような・・・）
+    '''
