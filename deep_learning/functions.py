@@ -43,6 +43,28 @@ def softmax(a):
 def mean_squared_error(y, t):
     return 0.5 * np.sum((y - t)**2)
 
+# 交差エントロピー誤差（バッチ処理対応版）
+# 引数:
+# y: ニューラルネットワークの出力（2次元配列。1入力に対する出力セット×入力数分。）
+# t: 教師データ（yと同じ形）
+def cross_entropy_error(y, t):
+    # 入力が1セットのみの場合は2次元配列に整形する [a, b, c] => [[a, b, c]]
+    if y.ndim == 1:
+        t = t.reshape(1, t.size)
+        y = y.reshape(1, y.size)
+        
+    # 教師データがone-hot-vectorの場合、正解ラベルのインデックスに変換
+    if t.size == y.size: # sizeは要素数（3×3なら9）
+        # 1次元目（横軸）を基準に、正解ラベルのインデックスを抽出
+        t = t.argmax(axis=1)
+        
+    batch_size = y.shape[0] # 出力データ数（＝投入データ数）
+    
+    # y[np.arange(batch_size), t] : yの成分のうち正解ラベルに該当するもの
+    return -np.sum(np.log(y[np.arange(batch_size), t] + 1e-7)) / batch_size
+
+""" OLD
+
 # 交差エントロピー誤差
 # 教師データはone-hot表現になっていることが前提
 def cross_entropy_error(y, t):
@@ -89,3 +111,4 @@ def cross_entropy_error2(y, t):
     →正解ラベルの値だけが抽出できる。
     （numpyの配列はこういう動きみたい。自然なような、恣意的なような・・・）
     '''
+"""

@@ -6,7 +6,7 @@ import numpy as np
 #
 # 引数...
 # f : 関数
-# x : 点（1次元配列）
+# x : 点（n次元配列）
 def numerical_gradient(f, x):
     
     # ごく小さな変化量
@@ -14,13 +14,18 @@ def numerical_gradient(f, x):
     # if x == [x0, x1, x2] then grad == [0, 0, 0]
     grad = np.zeros_like(x)
     
-    # xの各要素について偏微分係数を計算
-    for idx in range(x.size):
+    # xの各成分について偏微分係数を計算
+    # 多次元配列の各成分を遍歴するイテレータを取得
+    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
+    
+    while not it.finished:
+        # 現在の座標（多次元）
+        idx = it.multi_index
         
         tmp_val = x[idx]
         
         # 正方向の差分 : xの1成分を正方向にずらしたときの関数の値
-        x[idx] = tmp_val + h
+        x[idx] = float(tmp_val) + h
         dfdx_plus = f(x)
         
         # 負方向の差分 : xの1成分を負方向にずらしたときの関数の値
@@ -33,6 +38,8 @@ def numerical_gradient(f, x):
         
         # tmp値を元に戻す
         x[idx] = tmp_val
+        
+        it.iternext()
     
     return grad
     
